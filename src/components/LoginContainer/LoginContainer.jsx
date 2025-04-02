@@ -12,7 +12,8 @@ const LoginContainer = () => {
             </label>
             <input
               type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm  border-2  focus:border-emerald-700 focus:ring-emerald-800"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border-2 focus:border-emerald-700 focus:ring-emerald-800"
+              style={{ paddingLeft: "5px" }}
             />
           </div>
           <div>
@@ -21,7 +22,8 @@ const LoginContainer = () => {
             </label>
             <input
               type="email"
-              className="mt-1 block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-green-500 focus:ring-green-500 "
+              className="mt-1 block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              style={{ paddingLeft: "5px" }}
             />
           </div>
           <button
