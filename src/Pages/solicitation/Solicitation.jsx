@@ -1,8 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/footer";
+import api from "../../services/api";
 
 const Solicitation = () => {
+  const inputUrgencyRef = useRef();
+  const inputCategoryEquipmentRef = useRef();
+  const inputEquipmentRef = useRef();
+  const inputCategoryServiceRef = useRef();
+  const inputDescriptionRef = useRef();
+
+  async function createSoli() {
+    const usuario = "Renan";
+    const filial = "Matriz";
+    const equipment = "Computador";
+    const data = {
+      numSol: 1,
+      userName: usuario,
+      filial: filial,
+      urgency: inputUrgencyRef.current.value,
+      categoryEquipment: inputCategoryEquipmentRef.current.value,
+      tagEquipment: inputEquipmentRef.current.value,
+      equipment: equipment,
+      categoryService: inputCategoryServiceRef.current.value,
+      description: inputDescriptionRef.current.value,
+      status: "Pendente",
+      statusDelete: false,
+      costCenter: "Agricola",
+    };
+
+    try {
+      const response = await api.post("/solicitation", data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error creating solicitation:", error);
+    }
+
+    try {
+      const response = await api.post("/solicitationHistoric", data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error creating solicitation:", error);
+    }
+  }
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -49,6 +90,7 @@ const Solicitation = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
+              ref={inputUrgencyRef}
             >
               <option value="" disabled>
                 Selecione a urgência
@@ -78,6 +120,7 @@ const Solicitation = () => {
             <select
               id="equipmentCategory"
               name="equipmentCategory"
+              ref={inputCategoryEquipmentRef}
               value={formData.equipmentCategory || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -102,6 +145,7 @@ const Solicitation = () => {
             <select
               id="equipment"
               name="equipment"
+              ref={inputEquipmentRef}
               value={formData.equipment || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -126,6 +170,7 @@ const Solicitation = () => {
             <select
               id="service"
               name="service"
+              ref={inputCategoryServiceRef}
               value={formData.service || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -150,6 +195,7 @@ const Solicitation = () => {
             <textarea
               id="description"
               name="description"
+              ref={inputDescriptionRef}
               value={formData.description}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -161,6 +207,7 @@ const Solicitation = () => {
           <button
             type="submit"
             className="w-full bg-emerald-600 text-white gon py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+            onClick={createSoli}
           >
             Enviar Solicitação
           </button>
