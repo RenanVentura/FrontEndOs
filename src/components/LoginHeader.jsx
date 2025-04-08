@@ -1,4 +1,4 @@
-import LogoQuallY from "../../assets/Logo Qually-Sem fundo.png";
+import LogoQuallY from "../assets/Logo Qually-Sem fundo.png";
 
 const LoginHeader = () => {
   return (

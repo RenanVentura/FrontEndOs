@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/footer";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 import api from "../../services/api";
 
 const Solicitation = () => {
