@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import api from "../../services/api";
+import { jwtDecode } from "jwt-decode";
 
 const Solicitation = () => {
   const inputUrgencyRef = useRef();
@@ -11,9 +12,19 @@ const Solicitation = () => {
   const inputDescriptionRef = useRef();
 
   async function createSoli() {
-    const usuario = "Renan";
-    const filial = "Matriz";
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.error("Token não encontrado.");
+      return;
+    }
+
+    const decoded = jwtDecode(token);
+    const usuario = decoded.name;
+    const filial = decoded.filial;
+    const costCenter = decoded.costCenter;
     const equipment = "Computador";
+
     const data = {
       numSol: 1,
       userName: usuario,
@@ -26,7 +37,7 @@ const Solicitation = () => {
       description: inputDescriptionRef.current.value,
       status: "Pendente",
       statusDelete: false,
-      costCenter: "Agricola",
+      costCenter: costCenter,
     };
 
     try {
@@ -224,15 +235,13 @@ const Solicitation = () => {
             Cancelar Solicitação
           </button>
         </form>
-        <div className="max-w-2xl mx-auto">
-          <button
-            onClick={handleLogout}
-            type="button"
-            className="w-full mt-3 bg-red-700 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Sair
-          </button>
-        </div>
+        <button
+          onClick={handleLogout}
+          type="button"
+          className="w-full mt-3 bg-red-700 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+        >
+          Sair
+        </button>
       </main>
       <Footer />
     </div>
