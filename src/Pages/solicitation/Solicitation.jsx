@@ -65,6 +65,12 @@ const Solicitation = () => {
     console.log(formData);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("nivel");
+    window.location.href = "/";
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
@@ -218,8 +224,16 @@ const Solicitation = () => {
             Cancelar Solicitação
           </button>
         </form>
+        <div className="max-w-2xl mx-auto">
+          <button
+            onClick={handleLogout}
+            type="button"
+            className="w-full mt-3 bg-red-700 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Sair
+          </button>
+        </div>
       </main>
-
       <Footer />
     </div>
   );

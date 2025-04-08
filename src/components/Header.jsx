@@ -9,15 +9,21 @@ const Header = () => {
         <img src={LogoQually} alt="Logo" className="h-15 hidden md:block" />
         <img src={Logo} alt="Logo" className="h-10 md:hidden" />
         <nav>
-          <ol className="flex space-x-6">
-            <li className="hover:text-emerald-600 cursor-pointer text-emerald-50 font-bold">
-              Solicitação
+          <ol className="flex space-x-6 items-center">
+            <li>
+              <button className=" hover:bg-emerald-700 text-emerald-50 font-bold transition-colors">
+                Solicitação
+              </button>
             </li>
-            <li className="hover:text-emerald-600 cursor-pointer text-emerald-50 font-bold">
-              Follow-up
+            <li>
+              <button className=" hover:bg-emerald-700 text-emerald-50 font-bold transition-colors">
+                Follow-up
+              </button>
             </li>
-            <li className="hover:text-emerald-600 cursor-pointer text-emerald-50 font-bold">
-              Cadastro
+            <li>
+              <button className="  hover:bg-emerald-700 text-emerald-50 font-bold transition-colors">
+                Cadastro
+              </button>
             </li>
           </ol>
         </nav>
