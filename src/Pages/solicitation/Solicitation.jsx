@@ -23,7 +23,14 @@ const Solicitation = () => {
     const usuario = decoded.name;
     const filial = decoded.filial;
     const costCenter = decoded.costCenter;
-    const equipment = "Computador";
+
+    const selectedTag = inputEquipmentRef.current.value;
+
+    const selectedEquipment = equipments.find(
+      (equip) => equip.tagEquipment === selectedTag
+    );
+
+    const equipmentName = selectedEquipment ? selectedEquipment.name : "";
 
     const data = {
       numSol: 1,
@@ -32,7 +39,7 @@ const Solicitation = () => {
       urgency: inputUrgencyRef.current.value,
       categoryEquipment: inputCategoryEquipmentRef.current.value,
       tagEquipment: inputEquipmentRef.current.value,
-      equipment: equipment,
+      equipment: equipmentName,
       categoryService: inputCategoryServiceRef.current.value,
       description: inputDescriptionRef.current.value,
       status: "Pendente",
@@ -77,12 +84,15 @@ const Solicitation = () => {
           api.get("/Equipament", config),
         ]);
 
-        setEquipmentCategories(categoriesRes.data);
-
+        // Filtrar por filial
+        const filteredCategories = categoriesRes.data.filter(
+          (category) => category.filial === userFilial
+        );
         const filteredEquipments = equipmentsRes.data.filter(
           (equip) => equip.filial === userFilial
         );
 
+        setEquipmentCategories(filteredCategories);
         setEquipments(filteredEquipments);
       } catch (error) {
         console.error("Erro ao buscar dados:", error.response?.data || error);
@@ -218,8 +228,8 @@ const Solicitation = () => {
                 Selecione o equipamento
               </option>
               {filteredEquipments.map((eq) => (
-                <option key={eq.id} value={eq.name}>
-                  {eq.name}
+                <option key={eq.id} value={eq.tagEquipment}>
+                  {eq.tagEquipment}
                 </option>
               ))}
             </select>
