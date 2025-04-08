@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import api from "../../services/api";
@@ -54,6 +54,35 @@ const Solicitation = () => {
       console.error("Error creating solicitation:", error);
     }
   }
+
+  const [equipmentCategories, setEquipmentCategories] = useState([]);
+  const [equipments, setEquipments] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const [categoriesRes, equipmentsRes] = await Promise.all([
+          api.get("/categoryEquipment", config),
+          api.get("/Equipament", config),
+        ]);
+
+        setEquipmentCategories(categoriesRes.data);
+        setEquipments(equipmentsRes.data);
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error.response?.data || error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -146,9 +175,11 @@ const Solicitation = () => {
               <option value="" disabled>
                 Selecione a categoria
               </option>
-              <option value="computers">Computadores</option>
-              <option value="printers">Impressoras</option>
-              <option value="network">Rede</option>
+              {equipmentCategories.map((cat) => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -171,9 +202,11 @@ const Solicitation = () => {
               <option value="" disabled>
                 Selecione o equipamento
               </option>
-              <option value="laptop">Laptop</option>
-              <option value="desktop">Desktop</option>
-              <option value="router">Roteador</option>
+              {equipments.map((eq) => (
+                <option key={eq.id} value={eq.name}>
+                  {eq.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -196,9 +229,10 @@ const Solicitation = () => {
               <option value="" disabled>
                 Selecione o serviço
               </option>
-              <option value="maintenance">Manutenção</option>
-              <option value="installation">Instalação</option>
-              <option value="repair">Reparo</option>
+              <option value="Borracheiro">Borracheiro</option>
+              <option value="Mecanico">Mecânico</option>
+              <option value="Eletrico">Eletrico</option>
+              <option value="Hidraulico">Hidráulico</option>
             </select>
           </div>
 
