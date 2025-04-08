@@ -57,6 +57,7 @@ const Solicitation = () => {
 
   const [equipmentCategories, setEquipmentCategories] = useState([]);
   const [equipments, setEquipments] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -110,6 +111,10 @@ const Solicitation = () => {
     localStorage.removeItem("nivel");
     window.location.href = "/";
   };
+
+  const filteredEquipments = equipments.filter(
+    (eq) => eq.categoryEquipment === selectedCategory
+  );
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -168,7 +173,10 @@ const Solicitation = () => {
               name="equipmentCategory"
               ref={inputCategoryEquipmentRef}
               value={formData.equipmentCategory || ""}
-              onChange={handleChange}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value); // Atualiza o filtro
+                handleChange(e); // Atualiza formData se necessário
+              }}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
             >
@@ -202,7 +210,7 @@ const Solicitation = () => {
               <option value="" disabled>
                 Selecione o equipamento
               </option>
-              {equipments.map((eq) => (
+              {filteredEquipments.map((eq) => (
                 <option key={eq.id} value={eq.name}>
                   {eq.name}
                 </option>
@@ -232,7 +240,7 @@ const Solicitation = () => {
               <option value="Borracheiro">Borracheiro</option>
               <option value="Mecanico">Mecânico</option>
               <option value="Eletrico">Eletrico</option>
-              <option value="Hidraulico">Hidráulico</option>
+              <option value="Lubrificação">Lubrificação</option>
             </select>
           </div>
 
@@ -269,13 +277,15 @@ const Solicitation = () => {
             Cancelar Solicitação
           </button>
         </form>
-        <button
-          onClick={handleLogout}
-          type="button"
-          className="w-full mt-3 bg-red-700 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
-        >
-          Sair
-        </button>
+        <div className="max-w-2xl mx-auto">
+          <button
+            onClick={handleLogout}
+            type="button"
+            className="w-full mt-3 bg-red-700 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Sair
+          </button>
+        </div>
       </main>
       <Footer />
     </div>
