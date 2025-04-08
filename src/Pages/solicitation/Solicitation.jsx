@@ -3,12 +3,13 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import api from "../../services/api";
 import { jwtDecode } from "jwt-decode";
+import DoneForm from "../../components/alerts/doneForms";
 
 const Solicitation = () => {
   const inputUrgencyRef = useRef();
   const inputCategoryEquipmentRef = useRef();
   const inputEquipmentRef = useRef();
-  const inputCategoryServiceRef = useRef();
+  const inputServiceRef = useRef();
   const inputDescriptionRef = useRef();
 
   async function createSoli() {
@@ -16,6 +17,16 @@ const Solicitation = () => {
 
     if (!token) {
       console.error("Token não encontrado.");
+      return;
+    }
+
+    if (
+      !inputUrgencyRef.current.value ||
+      !inputCategoryEquipmentRef.current.value ||
+      !inputEquipmentRef.current.value ||
+      !inputServiceRef.current.value ||
+      !inputDescriptionRef.current.value
+    ) {
       return;
     }
 
@@ -40,7 +51,7 @@ const Solicitation = () => {
       categoryEquipment: inputCategoryEquipmentRef.current.value,
       tagEquipment: inputEquipmentRef.current.value,
       equipment: equipmentName,
-      categoryService: inputCategoryServiceRef.current.value,
+      categoryService: inputServiceRef.current.value,
       description: inputDescriptionRef.current.value,
       status: "Pendente",
       statusDelete: false,
@@ -60,6 +71,23 @@ const Solicitation = () => {
     } catch (error) {
       console.error("Error creating solicitation:", error);
     }
+
+    inputUrgencyRef.current.value = "Selecione a urgência";
+    inputCategoryEquipmentRef.current.value = "Selecione a categoria";
+    inputEquipmentRef.current.value = "Selecione o equipamento";
+    inputServiceRef.current.value = "Selecione o serviço";
+    inputDescriptionRef.current.value = "";
+
+    setFormData({
+      title: "",
+      description: "",
+      priority: "normal",
+      department: "",
+      attachments: null,
+    });
+    setSelectedCategory("");
+
+    DoneForm();
   }
 
   const [equipmentCategories, setEquipmentCategories] = useState([]);
@@ -86,10 +114,11 @@ const Solicitation = () => {
 
         // Filtrar por filial
         const filteredCategories = categoriesRes.data.filter(
-          (category) => category.filial === userFilial
+          (category) =>
+            category.filial === userFilial && category.statusDelete === false
         );
         const filteredEquipments = equipmentsRes.data.filter(
-          (equip) => equip.filial === userFilial
+          (equip) => equip.filial === userFilial && equip.statusDelete === false
         );
 
         setEquipmentCategories(filteredCategories);
@@ -245,7 +274,7 @@ const Solicitation = () => {
             <select
               id="service"
               name="service"
-              ref={inputCategoryServiceRef}
+              ref={inputServiceRef}
               value={formData.service || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
