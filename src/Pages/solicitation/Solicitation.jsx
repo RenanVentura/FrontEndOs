@@ -43,8 +43,18 @@ const Solicitation = () => {
 
     const equipmentName = selectedEquipment ? selectedEquipment.name : "";
 
+    let newNumSol = 1;
+    try {
+      const resLast = await api.get("/solicitation/last", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      newNumSol = resLast.data + 1;
+    } catch (error) {
+      console.error("Erro ao buscar último número de solicitação", error);
+    }
+
     const data = {
-      numSol: 1,
+      numSol: newNumSol,
       userName: usuario,
       filial: filial,
       urgency: inputUrgencyRef.current.value,
