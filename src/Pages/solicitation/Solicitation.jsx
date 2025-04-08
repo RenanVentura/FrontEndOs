@@ -63,6 +63,8 @@ const Solicitation = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
+        const decoded = jwtDecode(token);
+        const userFilial = decoded.filial;
 
         const config = {
           headers: {
@@ -76,7 +78,12 @@ const Solicitation = () => {
         ]);
 
         setEquipmentCategories(categoriesRes.data);
-        setEquipments(equipmentsRes.data);
+
+        const filteredEquipments = equipmentsRes.data.filter(
+          (equip) => equip.filial === userFilial
+        );
+
+        setEquipments(filteredEquipments);
       } catch (error) {
         console.error("Erro ao buscar dados:", error.response?.data || error);
       }
@@ -241,6 +248,7 @@ const Solicitation = () => {
               <option value="Mecanico">Mecânico</option>
               <option value="Eletrico">Eletrico</option>
               <option value="Lubrificação">Lubrificação</option>
+              <option value="Solda">Solda</option>
             </select>
           </div>
 
