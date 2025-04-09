@@ -100,6 +100,23 @@ const Solicitation = () => {
     DoneForm();
   }
 
+  async function cancelSoli() {
+    inputUrgencyRef.current.value = "Selecione a urgência";
+    inputCategoryEquipmentRef.current.value = "Selecione a categoria";
+    inputEquipmentRef.current.value = "Selecione o equipamento";
+    inputServiceRef.current.value = "Selecione o serviço";
+    inputDescriptionRef.current.value = "";
+
+    setFormData({
+      title: "",
+      description: "",
+      priority: "normal",
+      department: "",
+      attachments: null,
+    });
+    setSelectedCategory("");
+  }
+
   const [equipmentCategories, setEquipmentCategories] = useState([]);
   const [equipments, setEquipments] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -329,6 +346,7 @@ const Solicitation = () => {
             Enviar Solicitação
           </button>
           <button
+            onClick={cancelSoli}
             type="submit"
             className="w-full mt-3 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
           >
