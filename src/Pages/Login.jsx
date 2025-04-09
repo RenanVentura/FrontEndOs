@@ -1,6 +1,6 @@
-import LoginHeader from "../../components/LoginHeader";
-import LoginContainer from "../../components/LoginContainer";
-import "./Login.css";
+import LoginHeader from "../components/LoginHeader";
+import LoginContainer from "../components/LoginContainer";
+import "./Global.css";
 
 function Login() {
   return (

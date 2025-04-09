@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
-import api from "../../services/api";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import api from "../services/api";
 import { jwtDecode } from "jwt-decode";
-import DoneForm from "../../components/alerts/doneForms";
+import DoneForm from "../components/alerts/doneForms";
 
 const Solicitation = () => {
   const inputUrgencyRef = useRef();
@@ -202,17 +202,17 @@ const Solicitation = () => {
               <option value="" disabled>
                 Selecione a urgência
               </option>
-              <option value="1. Equipamento principal parado por quebra">
-                1. Equipamento principal parado por quebra
+              <option value="Critico/Urgente">
+                • Equipamento principal parado por quebra
               </option>
-              <option value="2. Equipamento principal operando com restrições">
-                2. Equipamento principal operando com restrições
+              <option value="Alta">
+                • Equipamento principal operando com restrições
               </option>
-              <option value="3. Equipamento reserva parado por quebra">
-                3. Equipamento reserva parado por quebra
+              <option value="Moderada">
+                • Equipamento reserva parado por quebra
               </option>
-              <option value="4. Equipamento principal operando com restrições">
-                4. Equipamento reserva operando com restrições
+              <option value="Baixa/Agendada">
+                • Equipamento reserva operando com restrições
               </option>
             </select>
           </div>
@@ -309,6 +309,7 @@ const Solicitation = () => {
               Descrição
             </label>
             <textarea
+              placeholder="Descreva o problema detalhadamente"
               id="description"
               name="description"
               ref={inputDescriptionRef}

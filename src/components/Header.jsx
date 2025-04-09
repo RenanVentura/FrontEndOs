@@ -11,19 +11,25 @@ const Header = () => {
         <nav>
           <ol className="flex space-x-6 items-center">
             <li>
-              <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
-                Solicitação
-              </button>
+              <a href="/solicitation">
+                <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
+                  Solicitação
+                </button>
+              </a>
             </li>
             <li>
-              <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
-                Follow-up
-              </button>
+              <a href="/hubsolicitation">
+                <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
+                  Follow-up
+                </button>
+              </a>
             </li>
             <li>
-              <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
-                Cadastro
-              </button>
+              <a href="/insert">
+                <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
+                  Cadastro
+                </button>
+              </a>
             </li>
           </ol>
         </nav>
