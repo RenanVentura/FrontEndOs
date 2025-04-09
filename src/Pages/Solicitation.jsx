@@ -219,7 +219,7 @@ const Solicitation = () => {
               <option value="" disabled>
                 Selecione a urgência
               </option>
-              <option value="Critico/Urgente">
+              <option value="Crítico/Urgente">
                 • Equipamento principal parado por quebra
               </option>
               <option value="Alta">

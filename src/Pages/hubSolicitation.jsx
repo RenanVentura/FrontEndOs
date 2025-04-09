@@ -1,76 +1,131 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-
+import { jwtDecode } from "jwt-decode";
+import api from "../services/api";
 function HubSolicitation() {
+  const [solicitations, setSolicitations] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const decoded = jwtDecode(token);
+      const nivel = decoded.nivel;
+      const userName = decoded.name;
+
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const res = await api.get("/solicitation", config);
+        const allSolicitations = res.data;
+
+        const filtered =
+          nivel === 1
+            ? allSolicitations.filter((sol) => sol.userName === userName)
+            : allSolicitations;
+
+        const ordered = filtered.sort((a, b) => b.numSol - a.numSol);
+        setSolicitations(ordered);
+      } catch (error) {
+        console.error("Erro ao buscar solicitações:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("nivel");
+    window.location.href = "/";
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8 relative">
-        {/* Buttons container */}
         <div className="absolute left-4 top-4 flex gap-4">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-300">
-            Filtro
-          </button>
-          <Link
-            to="/"
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-300"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-lg transition-colors duration-300"
           >
             Sair
-          </Link>
+          </button>
+          <button className="bg-emerald-600 hover:bg-emerald-700 font-bold text-white px-4 py-2 rounded-lg transition-colors duration-300">
+            Filtro
+          </button>
         </div>
 
         <h1 className="text-3xl font-bold text-center mb-8">
           Follow-up de Solicitações
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Link
-            to="/nova-solicitacao"
-            className="p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col min-h-[250px]"
-          >
-            <h2 className="text-2xl font-semibold mb-4">Nova Solicitação</h2>
-            <p className="text-gray-600 mb-4">
-              Criar uma nova solicitação de serviço
-            </p>
-            <div className="mt-auto">{/* Espaço para dados adicionais */}</div>
-          </Link>
-
-          <Link
-            to="/minhas-solicitacoes"
-            className="p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col min-h-[250px]"
-          >
-            <h2 className="text-2xl font-semibold mb-4">Minhas Solicitações</h2>
-            <p className="text-gray-600 mb-4">
-              Visualizar e acompanhar suas solicitações
-            </p>
-            <div className="mt-auto">{/* Espaço para dados adicionais */}</div>
-          </Link>
-
-          <Link
-            to="/solicitacoes-pendentes"
-            className="p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col min-h-[250px]"
-          >
-            <h2 className="text-2xl font-semibold mb-4">
-              Solicitações Pendentes
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Verificar solicitações que precisam de atenção
-            </p>
-            <div className="mt-auto">{/* Espaço para dados adicionais */}</div>
-          </Link>
-
-          <Link
-            to="/historico-solicitacoes"
-            className="p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col min-h-[250px]"
-          >
-            <h2 className="text-2xl font-semibold mb-4">Histórico</h2>
-            <p className="text-gray-600 mb-4">
-              Acessar histórico completo de solicitações
-            </p>
-            <div className="mt-auto">{/* Espaço para dados adicionais */}</div>
-          </Link>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+            <thead className="bg-gray-100 text-left text-gray-700 uppercase text-sm">
+              <tr>
+                <th className="px-6 py-4">N° Solicitação</th>
+                <th className="px-6 py-4">Filial</th>
+                <th className="px-6 py-4">Solicitante</th>
+                <th className="px-6 py-4">Serviço</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Data de Criação</th>
+                <th className="px-6 py-4">Urgência</th>
+                <th className="px-6 py-4">Equipamento</th>
+                <th className="px-6 py-4">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {solicitations.map((sol, index) => (
+                <tr
+                  key={sol.id}
+                  className={`border-b ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  }`}
+                >
+                  <td className="px-6 py-4">{sol.numSol}</td>
+                  <td className="px-6 py-4">{sol.filial}</td>
+                  <td className="px-6 py-4">{sol.userName}</td>
+                  <td className="px-6 py-4">{sol.categoryService}</td>
+                  <td className="px-6 py-4">{sol.status}</td>
+                  <td className="px-6 py-4">
+                    {new Date(sol.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 flex items-center gap-2">
+                    <span
+                      className={`w-3 h-3 rounded-full ${
+                        sol.urgency === "Crítico/Urgente"
+                          ? "bg-red-600"
+                          : sol.urgency === "Alta"
+                          ? "bg-orange-500"
+                          : sol.urgency === "Moderada"
+                          ? "bg-yellow-400"
+                          : "bg-green-500"
+                      }`}
+                    ></span>
+                    {sol.urgency}
+                  </td>
+                  <td className="px-6 py-4">{sol.categoryEquipment}</td>
+                  <td className="px-6 py-4">
+                    <Link
+                      to={`/solicitacao/${sol.id}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Ver Detalhes
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </main>
       <Footer />
