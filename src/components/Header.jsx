@@ -11,17 +11,17 @@ const Header = () => {
         <nav>
           <ol className="flex space-x-6 items-center">
             <li>
-              <button className=" hover:bg-emerald-700 text-emerald-50 font-bold transition-colors">
+              <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
                 Solicitação
               </button>
             </li>
             <li>
-              <button className=" hover:bg-emerald-700 text-emerald-50 font-bold transition-colors">
+              <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
                 Follow-up
               </button>
             </li>
             <li>
-              <button className="  hover:bg-emerald-700 text-emerald-50 font-bold transition-colors">
+              <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
                 Cadastro
               </button>
             </li>
