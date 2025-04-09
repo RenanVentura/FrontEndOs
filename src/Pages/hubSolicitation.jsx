@@ -4,8 +4,12 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+
 function HubSolicitation() {
   const [solicitations, setSolicitations] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,6 +51,18 @@ function HubSolicitation() {
     window.location.href = "/";
   };
 
+  // PAGINAÇÃO
+  const totalPages = Math.ceil(solicitations.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = solicitations.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  const changePage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -84,7 +100,7 @@ function HubSolicitation() {
               </tr>
             </thead>
             <tbody>
-              {solicitations.map((sol, index) => (
+              {currentItems.map((sol, index) => (
                 <tr
                   key={sol.id}
                   className={`border-b ${
@@ -127,6 +143,38 @@ function HubSolicitation() {
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-white shadow-md px-4 py-2 rounded-xl flex gap-2 z-50">
+            <button
+              onClick={() => changePage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            >
+              <FaChevronLeft />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => changePage(i + 1)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === i + 1
+                    ? "bg-emerald-600 text-white"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => changePage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            >
+              <FaChevronRight />
+            </button>
+          </div>
+        )}
       </main>
       <Footer />
     </div>
