@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import DoneForm from "../components/alerts/doneForms";
 
 const Solicitation = () => {
+  const [loading, setLoading] = useState(false);
   const inputUrgencyRef = useRef();
   const inputCategoryEquipmentRef = useRef();
   const inputEquipmentRef = useRef();
@@ -13,6 +14,8 @@ const Solicitation = () => {
   const inputDescriptionRef = useRef();
 
   async function createSoli() {
+    if (loading) return;
+    setLoading(true);
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -98,6 +101,7 @@ const Solicitation = () => {
     setSelectedCategory("");
 
     DoneForm();
+    setLoading(false);
   }
 
   async function cancelSoli() {
@@ -340,10 +344,11 @@ const Solicitation = () => {
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 text-white gon py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+            className="w-full bg-emerald-600 text-white gon py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={createSoli}
+            disabled={loading}
           >
-            Enviar Solicitação
+            {loading ? "Enviando..." : "Enviar Solicitação"}
           </button>
           <button
             onClick={cancelSoli}
