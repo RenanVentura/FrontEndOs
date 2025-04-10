@@ -5,11 +5,14 @@ import Footer from "../components/Footer";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import SolicitationDialog from "../components/SolicitationDialog";
 
 function HubSolicitation() {
   const [solicitations, setSolicitations] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
+  const [selectedSolicitation, setSelectedSolicitation] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,12 +134,15 @@ function HubSolicitation() {
                   </td>
                   <td className="px-6 py-4">{sol.categoryEquipment}</td>
                   <td className="px-6 py-4">
-                    <Link
-                      to={`/solicitacao/${sol.id}`}
+                    <button
+                      onClick={() => {
+                        setSelectedSolicitation(sol);
+                        setIsDialogOpen(true);
+                      }}
                       className="text-blue-600 hover:underline"
                     >
                       Ver Detalhes
-                    </Link>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -175,6 +181,11 @@ function HubSolicitation() {
             </button>
           </div>
         )}
+        <SolicitationDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          solicitation={selectedSolicitation}
+        />
       </main>
       <Footer />
     </div>
