@@ -3,6 +3,8 @@ import { IoClose } from "react-icons/io5";
 import { GoPencil, GoTrash } from "react-icons/go";
 import api from "../services/api";
 import doneForms from "../components/alerts/doneForms";
+import ConfirmButton from "../components/alerts/ConfirmButtom";
+import Swal from "sweetalert2";
 
 function SolicitationDialog({ isOpen, onClose, solicitation }) {
   if (!isOpen) return null;
@@ -28,6 +30,36 @@ function SolicitationDialog({ isOpen, onClose, solicitation }) {
       console.error("Error updating solicitation:", error);
     }
   }
+
+  async function handleRemove() {
+    const confirmed = await ConfirmButton();
+
+    if (!confirmed) return;
+
+    const { _id, id, ...cleanSolicitation } = solicitation;
+    try {
+      await api.put(`/solicitation/${solicitation.id}`, {
+        statusDelete: true,
+      });
+
+      await api.post("solicitationHistoric", {
+        ...cleanSolicitation,
+        statusDelete: true,
+      });
+
+      await Swal.fire({
+        title: "Deletado!",
+        text: "A solicitação foi deletada com sucesso!",
+        icon: "success",
+      });
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Erro ao deletar:", error);
+      Swal.fire("Erro!", "Houve um problema ao deletar.", "error");
+    }
+  }
+
   const InfoItem = ({ label, value }) => (
     <div>
       <span className="font-medium text-gray-700">{label}:</span>{" "}
@@ -71,7 +103,10 @@ function SolicitationDialog({ isOpen, onClose, solicitation }) {
                 <GoPencil />
               </p>
             </button>
-            <button className="text-gray-400 hover:text-red-600 transition-colors">
+            <button
+              onClick={handleRemove}
+              className="text-gray-400 hover:text-red-600 transition-colors"
+            >
               <p className="text-2xl font-bold text-gray-500 hover:text-gray-600">
                 <GoTrash />
               </p>
