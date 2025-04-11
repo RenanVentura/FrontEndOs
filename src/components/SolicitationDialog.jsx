@@ -1,8 +1,39 @@
 import React from "react";
 import { IoClose } from "react-icons/io5";
+import { GoPencil, GoTrash } from "react-icons/go";
+import api from "../services/api";
+import doneForms from "../components/alerts/doneForms";
 
 function SolicitationDialog({ isOpen, onClose, solicitation }) {
   if (!isOpen) return null;
+
+  async function handleFinish() {
+    const { _id, id, ...cleanSolicitation } = solicitation;
+    try {
+      await api.put(`/solicitation/${solicitation.id}`, {
+        status: "Finalizado",
+        atendedAt: new Date(),
+      });
+      await api.post("solicitationHistoric", {
+        ...cleanSolicitation,
+        status: "Finalizado",
+        atendedAt: new Date(),
+      });
+      onClose();
+      doneForms();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Error updating solicitation:", error);
+    }
+  }
+  const InfoItem = ({ label, value }) => (
+    <div>
+      <span className="font-medium text-gray-700">{label}:</span>{" "}
+      <span className="text-gray-600">{value}</span>
+    </div>
+  );
 
   const UrgencyBadge = ({ urgency }) => {
     const urgencyColors = {
@@ -34,14 +65,26 @@ function SolicitationDialog({ isOpen, onClose, solicitation }) {
           <h2 className="text-2xl font-bold text-gray-800">
             Solicitação #{solicitation.numSol}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400  transition-colors"
-          >
-            <p className="text-2xl font-bold text-gray-500 hover:text-gray-600">
-              <IoClose />
-            </p>
-          </button>
+          <div className="flex items-center gap-4">
+            <button className="text-gray-400  transition-colors">
+              <p className="text-2xl font-bold text-gray-500 hover:text-gray-600">
+                <GoPencil />
+              </p>
+            </button>
+            <button className="text-gray-400 hover:text-red-600 transition-colors">
+              <p className="text-2xl font-bold text-gray-500 hover:text-gray-600">
+                <GoTrash />
+              </p>
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 transition-colors"
+            >
+              <p className="text-2xl font-bold text-gray-500 hover:text-gray-600">
+                <IoClose />
+              </p>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
@@ -101,25 +144,17 @@ function SolicitationDialog({ isOpen, onClose, solicitation }) {
           </p>
         </div>
 
-        {/* Footer */}
         <div className="mt-8 flex justify-end">
           <button
-            onClick={onClose}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors duration-200 shadow-sm"
+            onClick={handleFinish}
+            className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-700 transition-colors"
           >
-            Fechar
+            Finalizar
           </button>
         </div>
       </div>
     </div>
   );
 }
-
-const InfoItem = ({ label, value }) => (
-  <div>
-    <span className="font-medium text-gray-700">{label}:</span>{" "}
-    <span className="text-gray-600">{value}</span>
-  </div>
-);
 
 export default SolicitationDialog;
