@@ -30,7 +30,7 @@ function HubSolicitation() {
           },
         };
 
-        const res = await api.get("/solicitation", config);
+        const res = await api.get("/solicitation?deleted=false", config);
         const allSolicitations = res.data;
 
         const filtered =

@@ -139,8 +139,8 @@ const Solicitation = () => {
         };
 
         const [categoriesRes, equipmentsRes] = await Promise.all([
-          api.get("/categoryEquipment", config),
-          api.get("/Equipament", config),
+          api.get("/categoryEquipment?deleted=false", config),
+          api.get("/Equipament?deleted=false", config),
         ]);
 
         // Filtrar por filial
