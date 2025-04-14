@@ -66,7 +66,7 @@ const Solicitation = () => {
       equipment: equipmentName,
       categoryService: inputServiceRef.current.value,
       description: inputDescriptionRef.current.value,
-      status: "Pendente",
+      status: "Aberto",
       statusDelete: false,
       costCenter: costCenter,
     };
