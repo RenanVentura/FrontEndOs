@@ -187,6 +187,7 @@ function HubSolicitation() {
             <th className="px-6 py-4">Serviço</th>
             <th className="px-6 py-4">Status</th>
             <th className="px-6 py-4">Data</th>
+            <th className="px-6 py-4">Dias em aberto</th>
             <th className="px-6 py-4">Urgência</th>
             <th className="px-6 py-4">Equipamento</th>
             <th className="px-6 py-4">Ações</th>
@@ -202,6 +203,19 @@ function HubSolicitation() {
               <td className="px-6 py-4">{sol.status}</td>
               <td className="px-6 py-4">
                 {new Date(sol.createdAt).toLocaleDateString("pt-BR")}
+              </td>
+              <td className="px-6 py-4">
+                {(() => {
+                  const createdDate = new Date(sol.createdAt);
+                  const finalDate =
+                    sol.status.toLowerCase() === "finalizado"
+                      ? new Date(sol.atendedAt)
+                      : new Date();
+
+                  const diffTime = Math.abs(finalDate - createdDate);
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                  return `${diffDays} dia${diffDays > 1 ? "s" : ""}`;
+                })()}
               </td>
               <td className="px-6 py-4">{renderUrgencyBadge(sol.urgency)}</td>
               <td className="px-6 py-4">{sol.categoryEquipment}</td>
@@ -248,6 +262,20 @@ function HubSolicitation() {
           <p>
             <strong>Data:</strong>{" "}
             {new Date(sol.createdAt).toLocaleDateString("pt-BR")}
+          </p>
+          <p>
+            <strong>Dias em aberto:</strong>{" "}
+            {(() => {
+              const createdDate = new Date(sol.createdAt);
+              const finalDate =
+                sol.status.toLowerCase() === "finalizado"
+                  ? new Date(sol.atendedAt)
+                  : new Date();
+
+              const diffTime = Math.abs(finalDate - createdDate);
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              return `${diffDays} dia${diffDays > 1 ? "s" : ""}`;
+            })()}
           </p>
           <div className="flex items-center gap-2">
             <strong>Urgência:</strong> {renderUrgencyBadge(sol.urgency)}
