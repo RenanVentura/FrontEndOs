@@ -25,7 +25,7 @@ const Header = () => {
               </a>
             </li>
             <li>
-              <a href="/insert">
+              <a href="/register">
                 <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
                   Cadastro
                 </button>
