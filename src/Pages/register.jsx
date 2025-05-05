@@ -2,49 +2,106 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import RegisterUserDialog from "../components/registers/registerUser";
+import RegisterFilialDialog from "../components/registers/registerFilial";
 
-const Card = ({ title, onClick }) => (
-  <div
-    style={{
-      border: "1px solid #ddd",
-      padding: "20px",
-      margin: "10px",
-      textAlign: "center",
-      borderRadius: "12px",
-      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.15)",
-      transition: "transform 0.2s, box-shadow 0.2s",
-      backgroundColor: "#f9f9f9",
-      cursor: "pointer",
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "scale(1.05)";
-      e.currentTarget.style.boxShadow = "0 6px 15px rgba(0, 0, 0, 0.2)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "scale(1)";
-      e.currentTarget.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.15)";
-    }}
-    onClick={onClick}
-  >
-    <h3 style={{ color: "#333", marginBottom: "15px" }}>{title}</h3>
-    <button
+// Estilos extraídos para constantes
+const cardStyle = {
+  border: "1px solid #ddd",
+  padding: "20px",
+  margin: "10px",
+  textAlign: "center",
+  borderRadius: "12px",
+  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.15)",
+  transition: "transform 0.2s, box-shadow 0.2s",
+  backgroundColor: "#f9f9f9",
+  cursor: "pointer",
+};
+
+const cardHoverStyle = {
+  transform: "scale(1.05)",
+  boxShadow: "0 6px 15px rgba(0, 0, 0, 0.2)",
+};
+
+const buttonStyle = {
+  backgroundColor: "#4CAF50",
+  color: "white",
+  padding: "12px 25px",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontSize: "16px",
+  transition: "background-color 0.3s",
+};
+
+const buttonHoverStyle = {
+  backgroundColor: "#45a049",
+};
+
+const logoutButtonStyle = {
+  ...buttonStyle,
+  backgroundColor: "#f44336",
+};
+
+const logoutButtonHoverStyle = {
+  backgroundColor: "#d32f2f",
+};
+
+const modalStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+};
+
+const modalContentStyle = {
+  backgroundColor: "white",
+  padding: "30px",
+  borderRadius: "8px",
+  width: "80%",
+  maxWidth: "500px",
+  textAlign: "center",
+  boxShadow: "0 5px 15px rgba(0, 0, 0, 0.3)",
+};
+
+const modalButtonStyle = {
+  ...buttonStyle,
+  padding: "12px 24px",
+};
+
+const Card = ({ title, onClick }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+
+  return (
+    <div
       style={{
-        backgroundColor: "#4CAF50",
-        color: "white",
-        padding: "12px 25px",
-        border: "none",
-        borderRadius: "8px",
-        cursor: "pointer",
-        fontSize: "16px",
-        transition: "background-color 0.3s",
+        ...cardStyle,
+        ...(isHovered ? cardHoverStyle : {}),
       }}
-      onMouseEnter={(e) => (e.target.style.backgroundColor = "#45a049")}
-      onMouseLeave={(e) => (e.target.style.backgroundColor = "#4CAF50")}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
     >
-      Cadastrar
-    </button>
-  </div>
-);
+      <h3 style={{ color: "#333", marginBottom: "15px" }}>{title}</h3>
+      <button
+        style={{
+          ...buttonStyle,
+          ...(isButtonHovered ? buttonHoverStyle : {}),
+        }}
+        onMouseEnter={() => setIsButtonHovered(true)}
+        onMouseLeave={() => setIsButtonHovered(false)}
+      >
+        Cadastrar
+      </button>
+    </div>
+  );
+};
 
 const Register = () => {
   const [activeDialog, setActiveDialog] = useState(null);
@@ -66,10 +123,16 @@ const Register = () => {
     setModalTitle("");
   };
 
-  const handleUserSubmit = (userData) => {
-    console.log("Dados do usuário:", userData);
+  const handleSubmit = (data) => {
+    console.log("Dados enviados:", data);
     closeDialog();
   };
+
+  // Verifica se o usuário está autenticado
+  if (!localStorage.getItem("token")) {
+    window.location.href = "/login";
+    return null;
+  }
 
   return (
     <div
@@ -86,8 +149,7 @@ const Register = () => {
       <main
         style={{
           flex: 1,
-          paddingBottom: "80px", // Adiciona espaço para o footer
-          marginBottom: "20px", // Espaço extra para dispositivos móveis
+          paddingBottom: "80px",
         }}
       >
         {/* Botão de Logout */}
@@ -96,23 +158,12 @@ const Register = () => {
             display: "flex",
             justifyContent: "flex-end",
             padding: "10px 20px",
-            position: "relative",
-            zIndex: 1,
           }}
         >
           <button
             onClick={handleLogout}
             style={{
-              backgroundColor: "#f44336",
-              color: "white",
-              padding: "10px 20px",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "16px",
-              transition: "background-color 0.3s",
-              margin: "10px",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+              ...logoutButtonStyle,
             }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = "#d32f2f")}
             onMouseLeave={(e) => (e.target.style.backgroundColor = "#f44336")}
@@ -127,7 +178,6 @@ const Register = () => {
             marginTop: "20px",
             color: "#333",
             fontWeight: "bold",
-            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.2)",
             marginBottom: "30px",
             fontSize: "2rem",
           }}
@@ -164,66 +214,41 @@ const Register = () => {
         </div>
       </main>
 
-      {/* Diálogo de Cadastro de Usuário */}
+      {/* Diálogos específicos */}
       {activeDialog === "CADASTRO DE USUÁRIOS" && (
         <RegisterUserDialog
           open={true}
           onClose={closeDialog}
-          onSubmit={handleUserSubmit}
+          onSubmit={handleSubmit}
+        />
+      )}
+
+      {activeDialog === "CADASTRO DE FILIAIS" && (
+        <RegisterFilialDialog
+          open={true}
+          onClose={closeDialog}
+          onSubmit={handleSubmit}
         />
       )}
 
       {/* Modal genérico para outros cadastros */}
-      {activeDialog && activeDialog !== "CADASTRO DE USUÁRIOS" && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "30px",
-              borderRadius: "8px",
-              width: "80%",
-              maxWidth: "500px",
-              textAlign: "center",
-              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.3)",
-            }}
-          >
-            <h2 style={{ marginBottom: "20px" }}>{modalTitle}</h2>
-            <p style={{ marginBottom: "30px" }}>
-              Funcionalidade de {modalTitle.toLowerCase()} em desenvolvimento
-            </p>
-            <button
-              style={{
-                backgroundColor: "#4CAF50",
-                color: "white",
-                padding: "12px 24px",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "16px",
-                transition: "background-color 0.3s",
-              }}
-              onClick={closeDialog}
-            >
-              Fechar
-            </button>
+      {activeDialog &&
+        activeDialog !== "CADASTRO DE USUÁRIOS" &&
+        activeDialog !== "CADASTRO DE FILIAIS" && (
+          <div style={modalStyle}>
+            <div style={modalContentStyle}>
+              <h2 style={{ marginBottom: "20px" }}>{modalTitle}</h2>
+              <p style={{ marginBottom: "30px" }}>
+                Funcionalidade de {modalTitle.toLowerCase()} em desenvolvimento
+              </p>
+              <button style={modalButtonStyle} onClick={closeDialog}>
+                Fechar
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <Footer style={{ position: "fixed", bottom: 0, width: "100%" }} />
+      <Footer />
     </div>
   );
 };
