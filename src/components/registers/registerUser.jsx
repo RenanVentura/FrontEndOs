@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../../services/api";
+import { jwtDecode } from "jwt-decode";
 
 const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -9,12 +10,41 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
     levelUser: "",
     filial: "",
     costCenter: "",
-    statusDelete: false, // Adicionado campo obrigatório
+    statusDelete: false,
   });
 
+  const [filiais, setFiliais] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchFiliais = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const decoded = jwtDecode(token);
+        const userFilial = decoded.filial;
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const response = await api.get("/filial", config);
+
+        // Supondo que você queira mostrar só a filial do usuário (se for o caso)
+        const filtered = response.data.filter(
+          (filial) => filial.statusDelete === false
+        );
+        setFiliais(filtered);
+      } catch (error) {
+        console.error("Erro ao buscar filiais:", error.response?.data || error);
+      }
+    };
+
+    fetchFiliais();
+  }, []);
 
   if (!open) return null;
 
@@ -31,10 +61,8 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
     try {
       const payload = {
         ...formData,
-        levelUser: parseInt(formData.levelUser), // Converte para número se necessário
+        levelUser: parseInt(formData.levelUser),
       };
-
-      console.log("Enviando dados:", payload); // Para debug
 
       const response = await api.post("/users", payload);
 
@@ -56,12 +84,7 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
         }, 1500);
       }
     } catch (err) {
-      console.error("Erro detalhado:", {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-      });
-
+      console.error("Erro detalhado:", err);
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
@@ -75,10 +98,24 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
       <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 mx-4 border border-gray-100">
-        {/* ... (cabeçalho e mensagens de erro/sucesso mantidos) ... */}
+        <h2 className="text-xl font-bold text-center mb-4">
+          Cadastro de Usuário
+        </h2>
+
+        {error && (
+          <div className="bg-red-100 text-red-700 p-2 mb-4 rounded-md text-sm text-center">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-green-100 text-green-700 p-2 mb-4 rounded-md text-sm text-center">
+            Usuário cadastrado com sucesso!
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Campo Nome */}
+          {/* Nome */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Nome Completo*
@@ -93,7 +130,7 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
             />
           </div>
 
-          {/* Campo Email */}
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Email*
@@ -108,7 +145,7 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
             />
           </div>
 
-          {/* Campo Senha */}
+          {/* Senha */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Senha* (mínimo 6 caracteres)
@@ -137,12 +174,12 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             >
               <option value="">Selecione</option>
-              <option value="1">Administrador</option>
-              <option value="2">Usuário</option>
+              <option value="2">Administrador</option>
+              <option value="1">Usuário</option>
             </select>
           </div>
 
-          {/* Filial */}
+          {/* Filial (dinâmica) */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Filial
@@ -154,9 +191,11 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             >
               <option value="">Selecione</option>
-              <option value="Matriz">Matriz</option>
-              <option value="Filial Norte">Filial Norte</option>
-              <option value="Filial Sul">Filial Sul</option>
+              {filiais.map((filial) => (
+                <option key={filial.id} value={filial.name}>
+                  {filial.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -172,9 +211,9 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             >
               <option value="">Selecione</option>
+              <option value="FROTAS">FROTAS</option>
+              <option value="AGRICOLA">AGRICOLA</option>
               <option value="TI">TI</option>
-              <option value="Financeiro">Financeiro</option>
-              <option value="RH">RH</option>
             </select>
           </div>
 
