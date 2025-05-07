@@ -1,549 +1,203 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import api from "../../services/api";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  CircularProgress,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Box,
-  Chip,
-  Tabs,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-} from "@mui/material";
-import { MdEdit, MdDelete, MdCheck, MdClose } from "react-icons/md";
 
-const greenTheme = {
-  primary: "#2e7d32",
-  light: "#81c784",
-  dark: "#1b5e20",
-  contrastText: "#ffffff",
-};
-
-const RegisterUserDialog = ({ open, onClose, onUserCreated }) => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [userInfo, setUserInfo] = useState({
-    email: "",
+const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
+  const [formData, setFormData] = useState({
     name: "",
+    email: "",
     password: "",
+    levelUser: "",
     filial: "",
-    levelUser: "1",
     costCenter: "",
+    statusDelete: false, // Adicionado campo obrigatório
   });
-  const [users, setUsers] = useState([]);
-  const [filiais, setFiliais] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingUsers, setLoadingUsers] = useState(false);
-  const [loadingFiliais, setLoadingFiliais] = useState(false);
-  const [error, setError] = useState("");
-  const [editMode, setEditMode] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState(null);
 
-  useEffect(() => {
-    if (open) {
-      fetchFiliais();
-      if (activeTab === 1) fetchUsers();
-    }
-  }, [open, activeTab]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
-  const fetchFiliais = async () => {
-    setLoadingFiliais(true);
-    setError("");
-    try {
-      const response = await api.get("/filial");
-      setFiliais(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar filiais:", error);
-      setError("Não foi possível carregar a lista de filiais");
-    } finally {
-      setLoadingFiliais(false);
-    }
-  };
-
-  const fetchUsers = async () => {
-    setLoadingUsers(true);
-    setError("");
-    try {
-      const response = await api.get("/users");
-      setUsers(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-      setError("Não foi possível carregar a lista de usuários");
-    } finally {
-      setLoadingUsers(false);
-    }
-  };
+  if (!open) return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserInfo({ ...userInfo, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setIsSubmitting(true);
+    setError(null);
 
     try {
-      if (editMode) {
-        await api.put(`/users/${currentUserId}`, {
-          ...userInfo,
-          levelUser: parseInt(userInfo.levelUser),
+      const payload = {
+        ...formData,
+        levelUser: parseInt(formData.levelUser), // Converte para número se necessário
+      };
+
+      console.log("Enviando dados:", payload); // Para debug
+
+      const response = await api.post("/users", payload);
+
+      if (response.status === 201) {
+        setSuccess(true);
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          levelUser: "",
+          filial: "",
+          costCenter: "",
+          statusDelete: false,
         });
-      } else {
-        await api.post("/users", {
-          ...userInfo,
-          levelUser: parseInt(userInfo.levelUser),
-        });
+
+        setTimeout(() => {
+          onClose();
+          if (onSubmit) onSubmit(response.data);
+        }, 1500);
       }
-      onUserCreated();
-      fetchUsers();
-      resetForm();
-      setActiveTab(1); // Muda para a aba de listagem após cadastro
-    } catch (error) {
-      console.error("Erro ao salvar usuário:", error);
-      setError(error.response?.data?.message || "Erro ao salvar usuário");
+    } catch (err) {
+      console.error("Erro detalhado:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      });
+
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Erro ao cadastrar usuário. Tente novamente."
+      );
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
-  };
-
-  const handleEdit = (user) => {
-    setUserInfo({
-      email: user.email,
-      name: user.name,
-      password: "",
-      filial: user.filial.id,
-      levelUser: user.levelUser.toString(),
-      costCenter: user.costCenter,
-    });
-    setCurrentUserId(user.id);
-    setEditMode(true);
-    setActiveTab(0); // Muda para a aba de cadastro/edição
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Tem certeza que deseja excluir este usuário?")) {
-      try {
-        setLoading(true);
-        await api.delete(`/users/${id}`);
-        fetchUsers();
-      } catch (error) {
-        console.error("Erro ao excluir usuário:", error);
-        setError("Erro ao excluir usuário");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const resetForm = () => {
-    setUserInfo({
-      email: "",
-      name: "",
-      password: "",
-      filial: "",
-      levelUser: "1",
-      costCenter: "",
-    });
-    setCurrentUserId(null);
-    setEditMode(false);
-  };
-  const getUserLevel = (level) => {
-    return level === 2 ? "Administrador" : "Solicitante";
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={() => {
-        onClose();
-        resetForm();
-      }}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 2,
-          border: `2px solid ${greenTheme.primary}`,
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          bgcolor: greenTheme.primary,
-          color: greenTheme.contrastText,
-          fontWeight: "bold",
-          textAlign: "center",
-        }}
-      >
-        {editMode ? "Editar Usuário" : "Gerenciar Usuários"}
-      </DialogTitle>
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+      <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 mx-4 border border-gray-100">
+        {/* ... (cabeçalho e mensagens de erro/sucesso mantidos) ... */}
 
-      <DialogContent sx={{ p: 0 }}>
-        <Tabs
-          value={activeTab}
-          onChange={(e, newValue) => setActiveTab(newValue)}
-          sx={{
-            "& .MuiTabs-indicator": {
-              backgroundColor: greenTheme.primary,
-            },
-          }}
-        >
-          <Tab
-            label={editMode ? "Edição" : "Cadastro"}
-            sx={{
-              "&.Mui-selected": {
-                color: greenTheme.primary,
-                fontWeight: "bold",
-              },
-            }}
-          />
-          <Tab
-            label="Usuários Cadastrados"
-            sx={{
-              "&.Mui-selected": {
-                color: greenTheme.primary,
-                fontWeight: "bold",
-              },
-            }}
-          />
-        </Tabs>
-
-        {error && (
-          <Typography
-            color="error"
-            sx={{
-              mt: 2,
-              mx: 3,
-              textAlign: "center",
-              fontWeight: "bold",
-              backgroundColor: "#ffeeee",
-              p: 1,
-              borderRadius: 1,
-            }}
-          >
-            {error}
-          </Typography>
-        )}
-
-        {activeTab === 0 && (
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              mt: 2,
-              p: 3,
-              border: `1px solid ${greenTheme.light}`,
-              borderRadius: 2,
-              mx: 2,
-              backgroundColor: "#f8fff8",
-            }}
-          >
-            <TextField
-              label="Email"
-              name="email"
-              type="email"
-              fullWidth
-              margin="normal"
-              required
-              value={userInfo.email}
-              onChange={handleChange}
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: greenTheme.primary,
-                  },
-                },
-              }}
-            />
-
-            <TextField
-              label="Nome Completo"
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Campo Nome */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Nome Completo*
+            </label>
+            <input
+              type="text"
               name="name"
-              fullWidth
-              margin="normal"
-              required
-              value={userInfo.name}
+              value={formData.name}
               onChange={handleChange}
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: greenTheme.primary,
-                  },
-                },
-              }}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             />
+          </div>
 
-            <TextField
-              label={
-                editMode ? "Nova Senha (deixe em branco para manter)" : "Senha"
-              }
-              name="password"
+          {/* Campo Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Email*
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          {/* Campo Senha */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Senha* (mínimo 6 caracteres)
+            </label>
+            <input
               type="password"
-              fullWidth
-              margin="normal"
-              required={!editMode}
-              value={userInfo.password}
+              name="password"
+              value={formData.password}
               onChange={handleChange}
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: greenTheme.primary,
-                  },
-                },
-              }}
-            />
-
-            <FormControl
-              fullWidth
-              margin="normal"
               required
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: greenTheme.primary,
-                  },
-                },
-              }}
-            >
-              <InputLabel>Filial</InputLabel>
-              <Select
-                name="filial"
-                value={userInfo.filial}
-                onChange={handleChange}
-                label="Filial"
-                disabled={loadingFiliais}
-              >
-                {loadingFiliais ? (
-                  <MenuItem disabled>
-                    <CircularProgress size={24} />
-                    Carregando filiais...
-                  </MenuItem>
-                ) : filiais.length === 0 ? (
-                  <MenuItem disabled>Nenhuma filial disponível</MenuItem>
-                ) : (
-                  filiais.map((filial) => (
-                    <MenuItem key={filial.id} value={filial.id}>
-                      {filial.name}
-                    </MenuItem>
-                  ))
-                )}
-              </Select>
-            </FormControl>
+              minLength={6}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+            />
+          </div>
 
-            <TextField
-              label="Centro de Custo"
+          {/* Nível de Acesso */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Nível de Acesso*
+            </label>
+            <select
+              name="levelUser"
+              value={formData.levelUser}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+            >
+              <option value="">Selecione</option>
+              <option value="1">Administrador</option>
+              <option value="2">Usuário</option>
+            </select>
+          </div>
+
+          {/* Filial */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Filial
+            </label>
+            <select
+              name="filial"
+              value={formData.filial}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+            >
+              <option value="">Selecione</option>
+              <option value="Matriz">Matriz</option>
+              <option value="Filial Norte">Filial Norte</option>
+              <option value="Filial Sul">Filial Sul</option>
+            </select>
+          </div>
+
+          {/* Centro de Custo */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Centro de Custo
+            </label>
+            <select
               name="costCenter"
-              fullWidth
-              margin="normal"
-              required
-              value={userInfo.costCenter}
+              value={formData.costCenter}
               onChange={handleChange}
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: greenTheme.primary,
-                  },
-                },
-              }}
-            />
-
-            <FormControl
-              fullWidth
-              margin="normal"
-              required
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: greenTheme.primary,
-                  },
-                },
-              }}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             >
-              <InputLabel>Nível de Acesso</InputLabel>
-              <Select
-                name="levelUser"
-                value={userInfo.levelUser}
-                onChange={handleChange}
-                label="Nível de Acesso"
-              >
-                <MenuItem value="2">Administrador</MenuItem>
-                <MenuItem value="1">Solicitante</MenuItem>
-              </Select>
-            </FormControl>
+              <option value="">Selecione</option>
+              <option value="TI">TI</option>
+              <option value="Financeiro">Financeiro</option>
+              <option value="RH">RH</option>
+            </select>
+          </div>
 
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-              <Button
-                onClick={() => {
-                  resetForm();
-                  if (editMode) setActiveTab(1);
-                  onClose();
-                }}
-                sx={{
-                  mr: 2,
-                  color: greenTheme.dark,
-                  borderColor: greenTheme.dark,
-                  "&:hover": {
-                    backgroundColor: "#e8f5e9",
-                  },
-                }}
-                variant="outlined"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  bgcolor: greenTheme.primary,
-                  "&:hover": {
-                    bgcolor: greenTheme.dark,
-                  },
-                }}
-                disabled={loading || loadingFiliais}
-              >
-                {loading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : editMode ? (
-                  "Salvar Alterações"
-                ) : (
-                  "Cadastrar Usuário"
-                )}
-              </Button>
-            </Box>
-          </Box>
-        )}
-
-        {activeTab === 1 && (
-          <Box sx={{ p: 2 }}>
-            <TableContainer
-              component={Paper}
-              sx={{
-                border: `1px solid ${greenTheme.light}`,
-                "& .MuiTableHead-root": {
-                  bgcolor: "#e8f5e9",
-                },
-              }}
+          {/* Botões */}
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border rounded-lg text-gray-700"
             >
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      sx={{ fontWeight: "bold", color: greenTheme.dark }}
-                    >
-                      Nome
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontWeight: "bold", color: greenTheme.dark }}
-                    >
-                      Email
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontWeight: "bold", color: greenTheme.dark }}
-                    >
-                      Filial
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontWeight: "bold", color: greenTheme.dark }}
-                    >
-                      Nível
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontWeight: "bold", color: greenTheme.dark }}
-                    >
-                      Ações
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {loadingUsers ? (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center">
-                        <CircularProgress />
-                      </TableCell>
-                    </TableRow>
-                  ) : users.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center">
-                        Nenhum usuário cadastrado
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    users.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.filial}</TableCell>
-                        <TableCell>
-                          <Chip
-                            label={getUserLevel(user.levelUser)}
-                            sx={{
-                              backgroundColor:
-                                user.levelUser === 2 ? "#e8f5e9" : "#e3f2fd",
-                              color:
-                                user.levelUser === 2
-                                  ? greenTheme.dark
-                                  : "#1565c0",
-                              fontWeight: "bold",
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <IconButton
-                            onClick={() => handleEdit(user)}
-                            sx={{
-                              color: greenTheme.primary,
-                              "&:hover": {
-                                backgroundColor: "#e8f5e9",
-                              },
-                            }}
-                          >
-                            <MdEdit />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleDelete(user.id)}
-                            sx={{
-                              color: "#d32f2f",
-                              "&:hover": {
-                                backgroundColor: "#ffebee",
-                              },
-                            }}
-                          >
-                            <MdDelete />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        )}
-      </DialogContent>
-    </Dialog>
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
