@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { GoPencil, GoTrash } from "react-icons/go";
+import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 import doneForms from "../components/alerts/doneForms";
 import ConfirmButton from "../components/alerts/ConfirmButtom";
@@ -8,6 +9,9 @@ import Swal from "sweetalert2";
 
 function SolicitationDialog({ isOpen, onClose, solicitation }) {
   const [isEditing, setIsEditing] = useState(false);
+  const token = localStorage.getItem("token");
+  const userLevel = token ? jwtDecode(token).nivel : null;
+
   const [editedValues, setEditedValues] = useState({
     status: solicitation?.status || "",
     atendedAt: solicitation?.atendedAt || "",
@@ -139,18 +143,22 @@ function SolicitationDialog({ isOpen, onClose, solicitation }) {
             Solicitação #{solicitation.numSol}
           </h2>
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsEditing(true)}
-              className="text-gray-400 hover:text-emerald-500 transition-colors"
-            >
-              <GoPencil size={22} />
-            </button>
-            <button
-              onClick={handleRemove}
-              className="text-gray-400 hover:text-red-600 transition-colors"
-            >
-              <GoTrash size={22} />
-            </button>
+            {userLevel !== 1 && (
+              <>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="text-gray-400 hover:text-emerald-500 transition-colors"
+                >
+                  <GoPencil size={22} />
+                </button>
+                <button
+                  onClick={handleRemove}
+                  className="text-gray-400 hover:text-red-600 transition-colors"
+                >
+                  <GoTrash size={22} />
+                </button>
+              </>
+            )}
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -230,28 +238,32 @@ function SolicitationDialog({ isOpen, onClose, solicitation }) {
         </div>
 
         {isEditing ? (
-          <div className="mt-6 flex justify-end gap-4">
-            <button
-              onClick={() => setIsEditing(false)}
-              className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-400 transition-colors "
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleUpdate}
-              className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              Salvar Alterações
-            </button>
-          </div>
+          userLevel !== 1 && (
+            <div className="mt-6 flex justify-end gap-4">
+              <button
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-400 transition-colors "
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleUpdate}
+                className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+              >
+                Salvar Alterações
+              </button>
+            </div>
+          )
         ) : (
           <div className="mt-6 flex justify-end">
-            <button
-              onClick={handleFinish}
-              className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              Finalizar
-            </button>
+            {userLevel !== 1 && (
+              <button
+                onClick={handleFinish}
+                className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+              >
+                Finalizar
+              </button>
+            )}
           </div>
         )}
       </div>
