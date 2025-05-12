@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import RegisterUserDialog from "../components/registers/registerUser";
 import RegisterFilialDialog from "../components/registers/registerFilial";
+import RegisterEquipmentDialog from "../components/registers/registerEquipment";
 
 const Card = ({ title, onClick }) => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
@@ -59,7 +60,6 @@ const Register = () => {
   return (
     <div className="font-sans bg-gray-100 min-h-screen flex flex-col">
       <Header />
-
       <main className="flex-1 pb-20">
         <div className="flex justify-end p-4">
           <button
@@ -92,8 +92,7 @@ const Register = () => {
             onClick={() => openDialog("CATEGORIA DE EQUIPAMENTOS")}
           />
         </div>
-      </main>
-
+      </main>{" "}
       {/* Diálogos específicos */}
       {activeDialog === "CADASTRO DE USUÁRIOS" && (
         <RegisterUserDialog
@@ -102,7 +101,6 @@ const Register = () => {
           onSubmit={handleSubmit}
         />
       )}
-
       {activeDialog === "CADASTRO DE FILIAIS" && (
         <RegisterFilialDialog
           open={true}
@@ -110,12 +108,20 @@ const Register = () => {
           onSubmit={handleSubmit}
         />
       )}
-
+      {activeDialog === "CADASTRO DE EQUIPAMENTOS" && (
+        <RegisterEquipmentDialog
+          open={true}
+          onClose={closeDialog}
+          onSubmit={handleSubmit}
+        />
+      )}
       {/* Modal genérico */}
       {activeDialog &&
-        !["CADASTRO DE USUÁRIOS", "CADASTRO DE FILIAIS"].includes(
-          activeDialog
-        ) && (
+        ![
+          "CADASTRO DE USUÁRIOS",
+          "CADASTRO DE FILIAIS",
+          "CADASTRO DE EQUIPAMENTOS",
+        ].includes(activeDialog) && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-8 rounded-md w-11/12 max-w-md text-center shadow-lg">
               <h2 className="text-xl font-semibold mb-4">{modalTitle}</h2>
@@ -131,7 +137,6 @@ const Register = () => {
             </div>
           </div>
         )}
-
       <Footer />
     </div>
   );
