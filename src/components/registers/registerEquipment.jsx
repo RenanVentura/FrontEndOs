@@ -13,9 +13,9 @@ const RegisterEquipmentDialog = ({ open, onClose, onSubmit }) => {
     categoryEquipment: "",
     statusDelete: false,
   });
-
   const [filiais, setFiliais] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -38,14 +38,13 @@ const RegisterEquipmentDialog = ({ open, onClose, onSubmit }) => {
         const filteredFiliais = filiaisResponse.data.filter(
           (filial) => filial.statusDelete === false
         );
-        setFiliais(filteredFiliais);
-
-        // Fetch categories
+        setFiliais(filteredFiliais); // Fetch categories
         const categoriesResponse = await api.get("/categoryEquipment", config);
-        const filteredCategories = categoriesResponse.data.filter(
+        const activeCategories = categoriesResponse.data.filter(
           (category) => !category.statusDelete
         );
-        setCategories(filteredCategories);
+        setAllCategories(activeCategories);
+        setFilteredCategories([]);
       } catch (error) {
         console.error("Erro ao buscar dados:", error.response?.data || error);
       }
@@ -55,10 +54,29 @@ const RegisterEquipmentDialog = ({ open, onClose, onSubmit }) => {
   }, []);
 
   if (!open) return null;
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "filial") {
+      // Quando a filial é selecionada, filtra as categorias
+      console.log("Filial selecionada:", value);
+      console.log("Todas as categorias:", allCategories);
+
+      const categoriesForFilial = allCategories.filter(
+        (category) => category.filial === value
+      );
+      console.log("Categorias filtradas:", categoriesForFilial);
+
+      setFilteredCategories(categoriesForFilial);
+
+      // Limpa a categoria selecionada quando troca a filial
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        categoryEquipment: "",
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,10 +110,11 @@ const RegisterEquipmentDialog = ({ open, onClose, onSubmit }) => {
         },
         timeout: 10000, // 10 segundos de timeout
       });
-
       if (response.status === 201 || response.status === 200) {
         console.log("Equipamento criado:", response.data);
         setSuccess(true);
+        setIsSubmitting(false);
+        // Limpa os campos
         setFormData({
           name: "",
           tagEquipment: "",
@@ -104,10 +123,9 @@ const RegisterEquipmentDialog = ({ open, onClose, onSubmit }) => {
           statusDelete: false,
         });
 
+        // Apenas esconde a mensagem após 1.5 segundos
         setTimeout(() => {
           setSuccess(false);
-          onClose();
-          if (onSubmit) onSubmit(response.data);
         }, 1500);
       }
     } catch (err) {
@@ -189,27 +207,6 @@ const RegisterEquipmentDialog = ({ open, onClose, onSubmit }) => {
               />
             </div>
 
-            {/* Categoria (dinâmica) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Categoria*
-              </label>
-              <select
-                name="categoryEquipment"
-                value={formData.categoryEquipment}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-              >
-                <option value="">Selecione</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {/* Filial (dinâmica) */}
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -226,6 +223,27 @@ const RegisterEquipmentDialog = ({ open, onClose, onSubmit }) => {
                 {filiais.map((filial) => (
                   <option key={filial.id} value={filial.name}>
                     {filial.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Categoria (dinâmica) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">
+                Categoria*
+              </label>
+              <select
+                name="categoryEquipment"
+                value={formData.categoryEquipment}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">Selecione</option>{" "}
+                {filteredCategories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name}
                   </option>
                 ))}
               </select>
