@@ -10,13 +10,17 @@ const LoginContainer = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:3000/api/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, senha }),
-      });
+      // const response = await fetch("http://localhost:3000/api/users/login", {
+      const response = await fetch(
+        "https://backendos.onrender.com/api/users/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, senha }),
+        }
+      );
 
       const data = await response.json();
 
