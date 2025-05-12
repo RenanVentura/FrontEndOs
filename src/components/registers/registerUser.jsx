@@ -68,9 +68,10 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
       };
 
       const response = await api.post("/users", payload);
-
       if (response.status === 201) {
         setSuccess(true);
+        setIsSubmitting(false);
+        // Limpa os campos
         setFormData({
           name: "",
           email: "",
@@ -81,9 +82,9 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
           statusDelete: false,
         });
 
+        // Apenas esconde a mensagem após 1.5 segundos
         setTimeout(() => {
-          onClose();
-          if (onSubmit) onSubmit(response.data);
+          setSuccess(false);
         }, 1500);
       }
     } catch (err) {

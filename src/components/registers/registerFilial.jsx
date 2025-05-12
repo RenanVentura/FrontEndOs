@@ -30,11 +30,17 @@ const RegisterFilialDialog = ({ open, onClose, onSubmit }) => {
       const response = await api.post("/filial", formData);
       if (response.status === 201) {
         setSuccess(true);
+        setIsSubmitting(false);
+        // Limpa os campos
         setFormData({
           name: "",
           statusDelete: false,
         });
-        if (onSubmit) onSubmit(response.data);
+
+        // Apenas esconde a mensagem após 1.5 segundos
+        setTimeout(() => {
+          setSuccess(false);
+        }, 1500);
       }
     } catch (err) {
       console.error("Erro detalhado:", err);
