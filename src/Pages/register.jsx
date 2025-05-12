@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import RegisterUserDialog from "../components/registers/RegisterUser";
+import RegisterUserDialog from "../components/registers/registerUser";
 import RegisterFilialDialog from "../components/registers/registerFilial";
 
 const Card = ({ title, onClick }) => {
@@ -66,7 +66,7 @@ const Register = () => {
             onClick={handleLogout}
             className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md transition duration-300"
           >
-            Logout
+            Sair
           </button>
         </div>
 
