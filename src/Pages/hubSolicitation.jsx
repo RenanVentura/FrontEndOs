@@ -123,7 +123,39 @@ function HubSolicitation() {
     }
     try {
       const dataToExport = filteredSolicitations.map(
-        ({ id, statusDelete, ...rest }) => rest
+        ({
+          id,
+          statusDelete,
+          createdAt,
+          atendedAt,
+          updatedAt,
+          numSol,
+          filial,
+          userName,
+          categoryService,
+          status,
+          urgency,
+          categoryEquipment,
+          ...rest
+        }) => ({
+          "N° Solicitação": numSol,
+          Filial: filial,
+          Solicitante: userName,
+          "Data de Criação": createdAt
+            ? new Date(createdAt).toLocaleDateString("pt-BR")
+            : "",
+          "Data de Atendimento": atendedAt
+            ? new Date(atendedAt).toLocaleDateString("pt-BR")
+            : "",
+          Serviço: categoryService,
+          Status: status,
+          Urgência: urgency,
+          Equipamento: categoryEquipment,
+          ...rest,
+          "Última Atualização": updatedAt
+            ? new Date(updatedAt).toLocaleDateString("pt-BR")
+            : "",
+        })
       );
       const worksheet = XLSX.utils.json_to_sheet(dataToExport);
       const workbook = XLSX.utils.book_new();
