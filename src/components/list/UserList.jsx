@@ -8,6 +8,8 @@ const UserListDialog = ({ open, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
   const [editForm, setEditForm] = useState({
     name: "",
     email: "",
@@ -108,6 +110,14 @@ const UserListDialog = ({ open, onClose }) => {
     }
   };
 
+  // Cálculos para paginação
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   if (!open) return null;
 
   return (
@@ -130,59 +140,124 @@ const UserListDialog = ({ open, onClose }) => {
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-2 px-4 border-b">Nome</th>
-                  <th className="py-2 px-4 border-b">E-mail</th>
-                  <th className="py-2 px-4 border-b">Nível</th>
-                  <th className="py-2 px-4 border-b">Status</th>
-                  <th className="py-2 px-4 border-b">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="py-2 px-4 border-b">{user.name}</td>
-                    <td className="py-2 px-4 border-b">{user.email}</td>
-                    <td className="py-2 px-4 border-b">
-                      {user.levelUser === 2
-                        ? "Administrador"
-                        : user.levelUser === 1
-                        ? "Solicitante"
-                        : "Desconhecido"}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {user.statusDelete ? (
-                        <span className="text-red-500">Inativo</span>
-                      ) : (
-                        <span className="text-green-500">Ativo</span>
-                      )}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      <div className="flex justify-center space-x-2">
-                        <button
-                          onClick={() => handleEdit(user)}
-                          className="text-blue-500 hover:text-blue-700"
-                          title="Editar"
-                        >
-                          <FaEdit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(user.id)}
-                          className="text-red-500 hover:text-red-700"
-                          title={user.statusDelete ? "Reativar" : "Desativar"}
-                        >
-                          <FaTrash size={18} />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border border-gray-200">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="py-2 px-4 border-b">Nome</th>
+                    <th className="py-2 px-4 border-b">E-mail</th>
+                    <th className="py-2 px-4 border-b">Nível</th>
+                    <th className="py-2 px-4 border-b">Status</th>
+                    <th className="py-2 px-4 border-b">Ações</th>
                   </tr>
+                </thead>
+                <tbody>
+                  {currentUsers.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="py-2 px-4 border-b">{user.name}</td>
+                      <td className="py-2 px-4 border-b">{user.email}</td>
+                      <td className="py-2 px-4 border-b">
+                        {user.levelUser === 2
+                          ? "Administrador"
+                          : user.levelUser === 1
+                          ? "Solicitante"
+                          : "Desconhecido"}
+                      </td>
+                      <td className="py-2 px-4 border-b">
+                        {user.statusDelete ? (
+                          <span className="text-red-500">Inativo</span>
+                        ) : (
+                          <span className="text-green-500">Ativo</span>
+                        )}
+                      </td>
+                      <td className="py-2 px-4 border-b">
+                        <div className="flex justify-center space-x-2">
+                          <button
+                            onClick={() => handleEdit(user)}
+                            className="text-blue-500 hover:text-blue-700"
+                            title="Editar"
+                          >
+                            <FaEdit size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            className="text-red-500 hover:text-red-700"
+                            title={user.statusDelete ? "Reativar" : "Desativar"}
+                          >
+                            <FaTrash size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Paginação */}
+            {totalPages > 1 && (
+              <div className="flex justify-center space-x-2 mt-4 mb-4">
+                <button
+                  onClick={() => paginate(1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === 1
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  Primeira
+                </button>
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === 1
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  Anterior
+                </button>
+                {[...Array(totalPages)].map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => paginate(index + 1)}
+                    className={`px-3 py-1 rounded ${
+                      currentPage === index + 1
+                        ? "bg-green-600 text-white"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
                 ))}
-              </tbody>
-            </table>
-          </div>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === totalPages
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  Próxima
+                </button>
+                <button
+                  onClick={() => paginate(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === totalPages
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  Última
+                </button>
+              </div>
+            )}
+          </>
         )}
 
         {editingUser && (
