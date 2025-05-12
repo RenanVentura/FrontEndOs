@@ -1,8 +1,12 @@
 import React from "react";
+import { jwtDecode } from "jwt-decode";
 import Logo from "../assets/favicon.ico";
 import LogoQually from "../assets/Logo Qually-Sem fundo.png";
 
 const Header = () => {
+  const token = localStorage.getItem("token");
+  const userLevel = token ? jwtDecode(token).nivel : null;
+
   return (
     <header className="bg-white shadow-md w-full p-4 bg-gradient-to-r from-emerald-700 via-emerald-800 to-emerald-900 rounded-b-md">
       <div className="container mx-auto flex justify-between items-center">
@@ -24,13 +28,15 @@ const Header = () => {
                 </button>
               </a>
             </li>
-            <li>
-              <a href="/register">
-                <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
-                  Cadastro
-                </button>
-              </a>
-            </li>
+            {userLevel !== 1 && (
+              <li>
+                <a href="/register">
+                  <button className=" h-8 w-22 hover:bg-emerald-700 text-emerald-50 font-bold transition-colors rounded-full">
+                    Cadastro
+                  </button>
+                </a>
+              </li>
+            )}
           </ol>
         </nav>
       </div>
