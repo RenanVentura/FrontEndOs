@@ -93,8 +93,6 @@ const RegisterUserDialog = ({ open, onClose, onSubmit }) => {
           err.response?.data?.error ||
           "Erro ao cadastrar usuário. Tente novamente."
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
