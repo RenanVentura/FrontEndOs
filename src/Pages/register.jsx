@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import RegisterUserDialog from "../components/registers/registerUser";
 import RegisterFilialDialog from "../components/registers/registerFilial";
 import RegisterEquipmentDialog from "../components/registers/registerEquipment";
+import RegisterEquipmentCategoryDialog from "../components/registers/registerEquipmentCategory";
 
 const Card = ({ title, onClick }) => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
@@ -88,7 +89,7 @@ const Register = () => {
             onClick={() => openDialog("CADASTRO DE EQUIPAMENTOS")}
           />
           <Card
-            title="CATEGORIA DE EQUIPAMENTOS"
+            title="CADASTRO DE CATEGORIA DE EQUIPAMENTOS"
             onClick={() => openDialog("CATEGORIA DE EQUIPAMENTOS")}
           />
         </div>
@@ -115,12 +116,20 @@ const Register = () => {
           onSubmit={handleSubmit}
         />
       )}
+      {activeDialog === "CATEGORIA DE EQUIPAMENTOS" && (
+        <RegisterEquipmentCategoryDialog
+          open={true}
+          onClose={closeDialog}
+          onSubmit={handleSubmit}
+        />
+      )}
       {/* Modal genérico */}
       {activeDialog &&
         ![
           "CADASTRO DE USUÁRIOS",
           "CADASTRO DE FILIAIS",
           "CADASTRO DE EQUIPAMENTOS",
+          "CATEGORIA DE EQUIPAMENTOS",
         ].includes(activeDialog) && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-8 rounded-md w-11/12 max-w-md text-center shadow-lg">
