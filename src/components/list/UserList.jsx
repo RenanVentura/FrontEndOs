@@ -28,9 +28,13 @@ const UserListDialog = ({ open, onClose }) => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        // "http://localhost:3000/api/users", {
+        "https://backendos.onrender.com/api/users",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setUsers(response.data);
       setLoading(false);
     } catch (err) {

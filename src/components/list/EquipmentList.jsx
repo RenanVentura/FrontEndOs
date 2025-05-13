@@ -23,9 +23,13 @@ const EquipmentListDialog = ({ open, onClose }) => {
   const fetchEquipments = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/Equipament", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        // "http://localhost:3000/api/Equipament",
+        "https://backendos.onrender.com/api/Equipament",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setEquipments(response.data);
       setLoading(false);
     } catch (err) {

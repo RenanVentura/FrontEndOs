@@ -23,7 +23,8 @@ const EquipmentCategoryListDialog = ({ open, onClose }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:3000/api/categoryEquipment",
+        // "http://localhost:3000/api/categoryEquipment",
+        "https://backendos.onrender.com/api/categoryEquipment",
         {
           headers: { Authorization: `Bearer ${token}` },
         }

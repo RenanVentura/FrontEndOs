@@ -1,11 +1,14 @@
 import React from "react";
 import { jwtDecode } from "jwt-decode";
+import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children, minNivel }) => {
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   if (!token) {
-    window.location.href = "/";
+    // window.location.href = "/";
+    navigate("/");
     return null;
   }
 
@@ -15,14 +18,17 @@ const ProtectedRoute = ({ children, minNivel }) => {
 
     if (nivel < minNivel) {
       alert("Acesso negado. Você não tem permissão para acessar esta página.");
-      window.location.href = "/";
+      // window.location.href = "/";
+      navigate("/");
+
       return null;
     }
 
     return children;
   } catch (error) {
     console.error("Erro ao decodificar token:", error);
-    window.location.href = "/";
+    navigate("/");
+    // window.location.href = "/";
     return null;
   }
 };

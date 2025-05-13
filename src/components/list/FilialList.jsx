@@ -21,9 +21,13 @@ const FilialListDialog = ({ open, onClose }) => {
   const fetchFiliais = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/filial", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        // "http://localhost:3000/api/filial",
+        "https://backendos.onrender.com/api/filial",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setFiliais(response.data);
       setLoading(false);
     } catch (err) {
