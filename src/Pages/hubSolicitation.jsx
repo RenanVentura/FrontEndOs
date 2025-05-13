@@ -8,6 +8,7 @@ import SolicitationDialog from "../components/SolicitationDialog";
 import FilterDialog from "../components/FilterDialog";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { useNavigate } from "react-router-dom";
 
 function HubSolicitation() {
   const [allSolicitations, setAllSolicitations] = useState([]);
@@ -21,6 +22,8 @@ function HubSolicitation() {
   const [isMobile, setIsMobile] = useState(false);
 
   const itemsPerPage = 9;
+
+  const navigate = useNavigate();
 
   const fetchSolicitations = async (params = {}) => {
     setLoading(true);
@@ -113,7 +116,7 @@ function HubSolicitation() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/";
+    navigate("/");
   };
 
   const handleExportToExcel = () => {

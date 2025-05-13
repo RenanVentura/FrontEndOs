@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import api from "../services/api";
 import { jwtDecode } from "jwt-decode";
 import DoneForm from "../components/alerts/doneForms";
+import { useNavigate } from "react-router-dom";
 
 const Solicitation = () => {
   const [loading, setLoading] = useState(false);
@@ -12,6 +13,7 @@ const Solicitation = () => {
   const inputEquipmentRef = useRef();
   const inputServiceRef = useRef();
   const inputDescriptionRef = useRef();
+  const navigate = useNavigate();
 
   async function createSoli() {
     if (loading) return;
@@ -140,7 +142,7 @@ const Solicitation = () => {
 
         const [categoriesRes, equipmentsRes] = await Promise.all([
           api.get("/categoryEquipment?deleted=false", config),
-          api.get("/Equipament?deleted=false", config),
+          api.get("/equipament?deleted=false", config),
         ]);
 
         // Filtrar por filial
@@ -186,7 +188,7 @@ const Solicitation = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("nivel");
-    window.location.href = "/";
+    navigate("/");
   };
 
   const filteredEquipments = equipments.filter(

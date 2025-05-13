@@ -103,7 +103,7 @@ const RegisterEquipmentDialog = ({ open, onClose, onSubmit }) => {
         statusDelete: false,
       };
 
-      const response = await api.post("/Equipament", equipmentData, {
+      const response = await api.post("/equipament", equipmentData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
