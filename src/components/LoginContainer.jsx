@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const LoginContainer = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +30,7 @@ const LoginContainer = () => {
       if (response.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("nivel", data.nivel);
-        window.location.href = "/solicitation";
+        navigate("/solicitation");
       } else {
         setErro(data.message || "Erro ao fazer login");
       }
