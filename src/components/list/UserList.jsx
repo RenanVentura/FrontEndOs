@@ -47,9 +47,13 @@ const UserListDialog = ({ open, onClose }) => {
   const fetchFiliais = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/filial", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        // "http://localhost:3000/api/filial", {
+        "https://backendos.onrender.com/api/filial",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const activeFiliais = response.data.filter(
         (filial) => !filial.statusDelete
       );
@@ -73,7 +77,8 @@ const UserListDialog = ({ open, onClose }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:3000/api/users/${editingUser.id}`,
+        // `http://localhost:3000/api/users/${editingUser.id}`,
+        `https://backendos.onrender.com/api/users/${editingUser.id}`,
         editForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -101,7 +106,8 @@ const UserListDialog = ({ open, onClose }) => {
       try {
         const token = localStorage.getItem("token");
         await axios.put(
-          `http://localhost:3000/api/users/${userId}`,
+          // `http://localhost:3000/api/users/${userId}`,
+          `https://backendos.onrender.com/api/users/${userId}`,
           { statusDelete: true },
           { headers: { Authorization: `Bearer ${token}` } }
         );

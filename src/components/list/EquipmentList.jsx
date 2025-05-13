@@ -50,7 +50,8 @@ const EquipmentListDialog = ({ open, onClose }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:3000/api/Equipament/${editingEquipment.id}`,
+        // `http://localhost:3000/api/Equipament/${editingEquipment.id}`,
+        `https://backendos.onrender.com/api/Equipament/${editingEquipment.id}`,
         editForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -79,7 +80,8 @@ const EquipmentListDialog = ({ open, onClose }) => {
       try {
         const token = localStorage.getItem("token");
         await axios.put(
-          `http://localhost:3000/api/Equipament/${equipmentId}`,
+          // `http://localhost:3000/api/Equipament/${equipmentId}`,
+          `https://backendos.onrender.com/api/Equipament/${equipmentId}`,
           { statusDelete: true },
           { headers: { Authorization: `Bearer ${token}` } }
         );

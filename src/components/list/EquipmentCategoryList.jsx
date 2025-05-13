@@ -50,7 +50,8 @@ const EquipmentCategoryListDialog = ({ open, onClose }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:3000/api/categoryEquipment/${editingCategory.id}`,
+        // `http://localhost:3000/api/categoryEquipment/${editingCategory.id}`,
+        `https://backendos.onrender.com/api/categoryEquipment/${editingCategory.id}`,
         editForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -79,7 +80,8 @@ const EquipmentCategoryListDialog = ({ open, onClose }) => {
       try {
         const token = localStorage.getItem("token");
         await axios.put(
-          `http://localhost:3000/api/categoryEquipment/${categoryId}`,
+          // `http://localhost:3000/api/categoryEquipment/${categoryId}`,
+          `https://backendos.onrender.com/api/categoryEquipment/${categoryId}`,
           { statusDelete: true },
           { headers: { Authorization: `Bearer ${token}` } }
         );

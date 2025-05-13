@@ -48,7 +48,8 @@ const FilialListDialog = ({ open, onClose }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:3000/api/filial/${editingFilial.id}`,
+        // `http://localhost:3000/api/filial/${editingFilial.id}`,
+        `https://backendos.onrender.com/api/filial/${editingFilial.id}`,
         editForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -77,7 +78,8 @@ const FilialListDialog = ({ open, onClose }) => {
       try {
         const token = localStorage.getItem("token");
         await axios.put(
-          `http://localhost:3000/api/filial/${filialId}`,
+          // `http://localhost:3000/api/filial/${filialId}`,
+          `https://backendos.onrender.com/api/filial/${filialId}`,
           { statusDelete: true },
           { headers: { Authorization: `Bearer ${token}` } }
         );
