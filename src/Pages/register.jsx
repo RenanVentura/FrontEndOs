@@ -5,9 +5,11 @@ import RegisterUserDialog from "../components/registers/registerUser";
 import RegisterFilialDialog from "../components/registers/registerFilial";
 import RegisterEquipmentDialog from "../components/registers/registerEquipment";
 import RegisterEquipmentCategoryDialog from "../components/registers/registerEquipmentCategory";
+import { useNavigate } from "react-router-dom";
 
 const Card = ({ title, onClick }) => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div
@@ -35,7 +37,7 @@ const Register = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("nivel");
-    window.location.href = "/";
+    navigate("/");
   };
 
   const openDialog = (title) => {
