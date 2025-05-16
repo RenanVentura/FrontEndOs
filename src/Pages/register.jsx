@@ -32,9 +32,8 @@ const Card = ({ title, onClick }) => {
 const Register = () => {
   const [activeDialog, setActiveDialog] = useState(null);
   const [modalTitle, setModalTitle] = useState("");
-
+  const navigate = useNavigate();
   const handleLogout = () => {
-    const navigate = useNavigate();
     localStorage.removeItem("token");
     localStorage.removeItem("nivel");
     navigate("/");
