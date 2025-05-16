@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 
 const Card = ({ title, onClick }) => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <div
@@ -35,6 +34,7 @@ const Register = () => {
   const [modalTitle, setModalTitle] = useState("");
 
   const handleLogout = () => {
+    const navigate = useNavigate();
     localStorage.removeItem("token");
     localStorage.removeItem("nivel");
     navigate("/");
