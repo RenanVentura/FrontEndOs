@@ -10,10 +10,14 @@ const Solicitation = () => {
   const [loading, setLoading] = useState(false);
   const inputUrgencyRef = useRef();
   const inputCategoryEquipmentRef = useRef();
-  const inputEquipmentRef = useRef();
   const inputServiceRef = useRef();
   const inputDescriptionRef = useRef();
   const navigate = useNavigate();
+
+  // Estado para o combobox de equipamentos
+  const [equipmentSearch, setEquipmentSearch] = useState("");
+  const [showEquipmentDropdown, setShowEquipmentDropdown] = useState(false);
+  const [selectedEquipment, setSelectedEquipment] = useState("");
 
   async function createSoli() {
     if (loading) return;
@@ -28,7 +32,7 @@ const Solicitation = () => {
     if (
       !inputUrgencyRef.current.value ||
       !inputCategoryEquipmentRef.current.value ||
-      !inputEquipmentRef.current.value ||
+      !selectedEquipment ||
       !inputServiceRef.current.value ||
       !inputDescriptionRef.current.value
     ) {
@@ -40,13 +44,11 @@ const Solicitation = () => {
     const filial = decoded.filial;
     const costCenter = decoded.costCenter;
 
-    const selectedTag = inputEquipmentRef.current.value;
-
-    const selectedEquipment = equipments.find(
-      (equip) => equip.tagEquipment === selectedTag
+    const selectedEq = equipments.find(
+      (equip) => equip.tagEquipment === selectedEquipment
     );
 
-    const equipmentName = selectedEquipment ? selectedEquipment.name : "";
+    const equipmentName = selectedEq ? selectedEq.name : "";
 
     let newNumSol = 1;
     try {
@@ -64,7 +66,7 @@ const Solicitation = () => {
       filial: filial,
       urgency: inputUrgencyRef.current.value,
       categoryEquipment: inputCategoryEquipmentRef.current.value,
-      tagEquipment: inputEquipmentRef.current.value,
+      tagEquipment: selectedEquipment,
       equipment: equipmentName,
       categoryService: inputServiceRef.current.value,
       description: inputDescriptionRef.current.value,
@@ -74,22 +76,17 @@ const Solicitation = () => {
     };
 
     try {
-      const response = await api.post("/solicitation", data);
-      console.log(response.data);
+      await api.post("/solicitation", data);
+      await api.post("/solicitationHistoric", data);
     } catch (error) {
       console.error("Error creating solicitation:", error);
     }
 
-    try {
-      const response = await api.post("/solicitationHistoric", data);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error creating solicitation:", error);
-    }
-
+    // Reset form
     inputUrgencyRef.current.value = "Selecione a urgência";
     inputCategoryEquipmentRef.current.value = "Selecione a categoria";
-    inputEquipmentRef.current.value = "Selecione o equipamento";
+    setSelectedEquipment("");
+    setEquipmentSearch("");
     inputServiceRef.current.value = "Selecione o serviço";
     inputDescriptionRef.current.value = "";
 
@@ -109,7 +106,8 @@ const Solicitation = () => {
   async function cancelSoli() {
     inputUrgencyRef.current.value = "Selecione a urgência";
     inputCategoryEquipmentRef.current.value = "Selecione a categoria";
-    inputEquipmentRef.current.value = "Selecione o equipamento";
+    setSelectedEquipment("");
+    setEquipmentSearch("");
     inputServiceRef.current.value = "Selecione o serviço";
     inputDescriptionRef.current.value = "";
 
@@ -145,7 +143,6 @@ const Solicitation = () => {
           api.get("/equipament?deleted=false", config),
         ]);
 
-        // Filtrar por filial
         const filteredCategories = categoriesRes.data.filter(
           (category) =>
             category.filial === userFilial && category.statusDelete === false
@@ -194,6 +191,22 @@ const Solicitation = () => {
   const filteredEquipments = equipments.filter(
     (eq) => eq.categoryEquipment === selectedCategory
   );
+
+  const sortedEquipments = [...filteredEquipments].sort((a, b) =>
+    a.tagEquipment.localeCompare(b.tagEquipment, "pt-BR", {
+      sensitivity: "base",
+    })
+  );
+
+  const displayedEquipments = sortedEquipments.filter((eq) =>
+    eq.tagEquipment.toLowerCase().includes(equipmentSearch.toLowerCase())
+  );
+
+  const handleEquipmentSelect = (tagEquipment) => {
+    setSelectedEquipment(tagEquipment);
+    setEquipmentSearch(tagEquipment);
+    setShowEquipmentDropdown(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -253,8 +266,10 @@ const Solicitation = () => {
               ref={inputCategoryEquipmentRef}
               value={formData.equipmentCategory || ""}
               onChange={(e) => {
-                setSelectedCategory(e.target.value); // Atualiza o filtro
-                handleChange(e); // Atualiza formData se necessário
+                setSelectedCategory(e.target.value);
+                handleChange(e);
+                setSelectedEquipment("");
+                setEquipmentSearch("");
               }}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
@@ -270,31 +285,62 @@ const Solicitation = () => {
             </select>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
               htmlFor="equipment"
             >
               Equipamento
             </label>
-            <select
-              id="equipment"
-              name="equipment"
-              ref={inputEquipmentRef}
-              value={formData.equipment || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              required
-            >
-              <option value="" disabled>
-                Selecione o equipamento
-              </option>
-              {filteredEquipments.map((eq) => (
-                <option key={eq.id} value={eq.tagEquipment}>
-                  {eq.tagEquipment}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Pesquisar ou selecionar equipamento..."
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                value={equipmentSearch}
+                onChange={(e) => {
+                  setEquipmentSearch(e.target.value);
+                  setShowEquipmentDropdown(true);
+                }}
+                onFocus={() => setShowEquipmentDropdown(true)}
+                required
+              />
+              {selectedEquipment && (
+                <button
+                  type="button"
+                  className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
+                  onClick={() => {
+                    setSelectedEquipment("");
+                    setEquipmentSearch("");
+                  }}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            {showEquipmentDropdown && displayedEquipments.length > 0 && (
+              <ul className="absolute z-10 mt-1 w-full max-h-60 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg">
+                {displayedEquipments.map((eq) => (
+                  <li
+                    key={eq.id}
+                    className={`px-3 py-2 cursor-pointer hover:bg-emerald-50 ${
+                      selectedEquipment === eq.tagEquipment
+                        ? "bg-emerald-100"
+                        : ""
+                    }`}
+                    onClick={() => handleEquipmentSelect(eq.tagEquipment)}
+                  >
+                    {eq.tagEquipment}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {showEquipmentDropdown && displayedEquipments.length === 0 && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg px-3 py-2 text-gray-500">
+                Nenhum equipamento encontrado
+              </div>
+            )}
           </div>
 
           <div className="mb-4">
@@ -346,7 +392,7 @@ const Solicitation = () => {
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 text-white gon py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={createSoli}
             disabled={loading}
           >
@@ -354,7 +400,7 @@ const Solicitation = () => {
           </button>
           <button
             onClick={cancelSoli}
-            type="submit"
+            type="button"
             className="w-full mt-3 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
           >
             Cancelar Solicitação
