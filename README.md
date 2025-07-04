@@ -54,6 +54,6 @@ A aplicação permite o controle de solicitações de serviços, com diferentes 
 A interface do projeto está hospedada na plataforma **[Vercel](https://vercel.com/)**.
 
 🔗 Acesse a aplicação em produção:  
-👉 **[https://seu-projeto.vercel.app](https://seu-projeto.vercel.app)**
+👉 **https://front-end-os.vercel.app/**
 
-> Substitua o link acima pela URL real do seu projeto na Vercel.
+
