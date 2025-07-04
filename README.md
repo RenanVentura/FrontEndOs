@@ -1,12 +1,59 @@
-# React + Vite
+# 🛠️ Projeto Solicitações de Serviços
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Deploy na Vercel](https://img.shields.io/badge/deploy-Vercel-black?logo=vercel)](https://seu-projeto.vercel.app)
 
-Currently, two official plugins are available:
+Este repositório contém uma aplicação web para criação e gerenciamento de solicitações de serviços.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Tecnologias utilizadas:
 
-## Expanding the ESLint configuration
+- ⚛️ **React**
+- ⚡ **ViteJS**
+- 🌐 **Express**
+- 🎨 **Tailwind CSS**
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 📋 Descrição
+
+A aplicação permite o controle de solicitações de serviços, com diferentes níveis de acesso:
+
+- 👤 **Solicitante**: 
+  - Pode criar novas solicitações;
+  - Visualiza apenas suas próprias solicitações.
+
+- 👨‍💼 **Administrador**:
+  - Pode cadastrar usuários;
+  - Visualiza todas as solicitações;
+  - Pode atender/resolver as solicitações.
+
+---
+
+## 🚀 Funcionalidades
+
+- ✅ Autenticação com controle de acesso;
+- 📝 Cadastro de solicitações;
+- 🔍 Visualização de solicitações por tipo de usuário;
+- ⚙️ Marcação de solicitações como atendidas (admin);
+- 💻 Interface responsiva com Tailwind CSS.
+
+---
+
+## 🧱 Tecnologias Utilizadas
+
+| Tecnologia   | Descrição                          |
+|--------------|------------------------------------|
+| React        | Biblioteca para construção de UI   |
+| ViteJS       | Ferramenta moderna de build        |
+| Express      | Framework backend em Node.js       |
+| Tailwind CSS | Utilitários de CSS para estilização|
+
+---
+
+## ☁️ Hospedagem
+
+A interface do projeto está hospedada na plataforma **[Vercel](https://vercel.com/)**.
+
+🔗 Acesse a aplicação em produção:  
+👉 **[https://seu-projeto.vercel.app](https://seu-projeto.vercel.app)**
+
+> Substitua o link acima pela URL real do seu projeto na Vercel.
